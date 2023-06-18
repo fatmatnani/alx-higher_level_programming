@@ -1,38 +1,24 @@
 #!/usr/bin/python3
 """
-Script that takes an argument and displays all values in the states table
-of hbtn_0e_0_usa where name matches the argument
+Displays all values in the states table of the database hbtn_0e_0_usa
+whose name matches that supplied as argument.
+Usage: ./2-my_filter_states.py <mysql username> \
+                                <mysql password> \
+                                <database name> \
+                                <state name searched>
 """
-
 import sys
 import MySQLdb
 
 if __name__ == "__main__":
-    # MySQL connection parameters
-    host = "localhost"
-    port = 3306
-    user = sys.argv[1]
-    password = sys.argv[2]
-    database = sys.argv[3]
-    state_name = sys.argv[4]
-
-    # Connect to the MySQL server
-    db = MySQLdb.connect(host=host, port=port, user=user, passwd=password, db=database)
-
-    # Create a cursor object to execute queries
-    cur = db.cursor()
-
-    # Prepare the SQL query with user input and execute it
-    query = "SELECT * FROM states WHERE name = %s ORDER BY id ASC"
-    cur.execute(query, (state_name,))
-
-    # Fetch all the rows from the result set
-    rows = cur.fetchall()
-
-    # Display the results
-    for row in rows:
-        print(row)
-
-    # Close the cursor and database connection
-    cur.close()
+    db = MySQLdb.connect(user=sys.argv[1], port=3306, host="localhost",
+                         passwd=sys.argv[2], db=sys.argv[3])
+    c = db.cursor()
+    c.execute("SELECT * FROM states WHERE name LIKE '{:s}' ORDER BY \
+    id ASC".format(sys.argv[4]))
+    states = c.fetchall()
+    for state in states:
+        if state[1] == sys.argv[4]:
+            print(state)
+    c.close()
     db.close()
